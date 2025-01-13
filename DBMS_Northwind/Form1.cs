@@ -13,6 +13,10 @@ namespace DBMS_Northwind
         SqlCommand cmd;
         SqlDataAdapter da;
 
+        int shipperID = 0;
+        string companyName = string.Empty;
+        string phone = string.Empty;
+
         private void dgvShippers_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
@@ -39,17 +43,21 @@ namespace DBMS_Northwind
 
         private void dgvShippers_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
         {
-            txtShipperID.Text = dgvShippers.CurrentRow.Cells[0].Value.ToString();
-            txtCompanyName.Text = dgvShippers.CurrentRow.Cells[1].Value.ToString();
-            txtPhone.Text = dgvShippers.CurrentRow.Cells[2].Value.ToString();
+            shipperID = Convert.ToInt32(dgvShippers.CurrentRow.Cells[0].Value);
+            companyName = dgvShippers.CurrentRow.Cells[1].Value.ToString();
+            phone = dgvShippers.CurrentRow.Cells[2].Value.ToString();
+
+            //txtShipperID.Text = dgvShippers.CurrentRow.Cells[0].Value.ToString();
+            //txtCompanyName.Text = dgvShippers.CurrentRow.Cells[1].Value.ToString();
+            //txtPhone.Text = dgvShippers.CurrentRow.Cells[2].Value.ToString();
         }
 
         private void clearForm()
         {
-            txtShipperID.Clear();
-            txtCompanyName.Clear();
-            txtPhone.Clear();
-            txtCompanyName.Focus();
+            //txtShipperID.Clear();
+            //txtCompanyName.Clear();
+            //txtPhone.Clear();
+            //txtCompanyName.Focus();
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -59,58 +67,79 @@ namespace DBMS_Northwind
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtCompanyName.Text))
-            {
-                MessageBox.Show("โปรดกรอกชื่อบริษัท", "เกิดข้อผิดพลาด");
-                return;
-            }
-            string sql = "Insert into shippers"
-                        + " Values(@companyName,@phone)";
-            cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@CompanyName", txtCompanyName.Text.Trim());
-            cmd.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());
-            int n = cmd.ExecuteNonQuery();
-            if (n > 0)
-            {
-                showdata();
-                clearForm();
-            }
+            frmShippers f = new frmShippers();
+            f.Status = "insert";
+            f.ShowDialog();
+            showdata();
+
+            //if (string.IsNullOrEmpty(txtCompanyName.Text))
+            //{
+            //    MessageBox.Show("โปรดกรอกชื่อบริษัท", "เกิดข้อผิดพลาด");
+            //    return;
+            //}
+            //string sql = "Insert into shippers"
+            //            + " Values(@companyName,@phone)";
+            //cmd = new SqlCommand(sql, conn);
+            //cmd.Parameters.AddWithValue("@CompanyName", txtCompanyName.Text.Trim());
+            //cmd.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());
+            //int n = cmd.ExecuteNonQuery();
+            //if (n > 0)
+            //{
+            //    showdata();
+            //    clearForm();
+            //}
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtShipperID.Text))
+            if (shipperID <= 0)
             {
-                MessageBox.Show("โปรดเลือกข้อมูลที่จะแก้ไข", "เกิดข้อผิดพลาด");
+                MessageBox.Show("โปรดเลือกข้อมูลที่จะปรับปรุงแก้ไข", "เกิดข้อผิดพลาด");
                 return;
             }
-            if (string.IsNullOrEmpty(txtCompanyName.Text))
-            {
-                MessageBox.Show("โปรดกรอกชื่อบริษัท", "เกิดข้อผิดพลาด");
-                return;
-            }
-            string sql = "Update shippers"
-                        + " Set CompanyName = @companyName,phone = @phone"
-                        + " where ShipperID = @shipperID";
-            cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@CompanyName", txtCompanyName.Text.Trim());
-            cmd.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());
-            cmd.Parameters.AddWithValue("@shipperID", txtShipperID.Text);
-            int n = cmd.ExecuteNonQuery();
-            if (n > 0)
-            {
-                showdata();
-                clearForm();
-            }
+            frmShippers f = new frmShippers();
+            f.Status = "update";
+            f.ShipperID = shipperID;
+            f.CompanyName = companyName;
+            f.Phone = phone;
+            f.ShowDialog();
+            showdata();
+
+            //if (string.IsNullOrEmpty(txtShipperID.Text))
+            //{
+            //    MessageBox.Show("โปรดเลือกข้อมูลที่จะแก้ไข", "เกิดข้อผิดพลาด");
+            //    return;
+            //}
+            //if (string.IsNullOrEmpty(txtCompanyName.Text))
+            //{
+            //    MessageBox.Show("โปรดกรอกชื่อบริษัท", "เกิดข้อผิดพลาด");
+            //    return;
+            //}
+            //string sql = "Update shippers"
+            //            + " Set CompanyName = @companyName,phone = @phone"
+            //            + " where ShipperID = @shipperID";
+            //cmd = new SqlCommand(sql, conn);
+            //cmd.Parameters.AddWithValue("@CompanyName", txtCompanyName.Text.Trim());
+            //cmd.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());
+            //cmd.Parameters.AddWithValue("@shipperID", txtShipperID.Text);
+            //int n = cmd.ExecuteNonQuery();
+            //if (n > 0)
+            //{
+            //    showdata();
+            //    clearForm();
+            //}
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("ต้องการลบข้อมูลชุดนี้หรือไม่","ยืนยัน?", MessageBoxButtons.YesNo) == DialogResult.No)
+            string msg = shipperID.ToString() + Environment.NewLine;
+            msg += "บริษัท :" + companyName;
+            msg += "โทร :" + phone;
+            if (MessageBox.Show(msg, "ต้องการลบข้อมูลชุดนี้หรือไม่", MessageBoxButtons.YesNo) == DialogResult.No)
             {
                 return;
             }
-            if (string.IsNullOrEmpty(txtShipperID.Text))
+            if (shipperID <= 0)
             {
                 MessageBox.Show("โปรดเลือกข้อมูลที่จะลบ", "เกิดข้อผิดพลาด");
                 return;
@@ -118,20 +147,25 @@ namespace DBMS_Northwind
             string sql = "Delete from shippers"
                         + " where ShipperID = @shipperID";
             cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@shipperID", txtShipperID.Text);
+            cmd.Parameters.AddWithValue("@shipperID", shipperID);
             try
             {
-            int n = cmd.ExecuteNonQuery();
-                        if (n > 0)
-                        {
-                            showdata();
-                            clearForm();
-                        }
+                int n = cmd.ExecuteNonQuery();
+                if (n > 0)
+                {
+                    showdata();
+                    clearForm();
+                }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 MessageBox.Show("เกิดข้อผิดพลาด" + Environment.NewLine + ex.Message, "Error!!!");
             }
+        }
+
+        private void dgvShippers_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            btnUpdate.PerformClick();
         }
     }
 }
